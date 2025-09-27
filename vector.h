@@ -167,8 +167,8 @@ public:
 	}
 
    // equals, not equals operator
-   bool operator != (const iterator& rhs) const { return true; }
-   bool operator == (const iterator& rhs) const { return true; }
+   bool operator != (const iterator& rhs) const { return p != rhs.p; }
+   bool operator == (const iterator& rhs) const { return p == rhs.p; }
 
    // dereference operator
    T& operator * ()
@@ -184,25 +184,30 @@ public:
    }
 
    // postfix increment
-   iterator operator ++ (int postfix)
+   iterator operator ++ (int)
    {
-      return *this;
+	   iterator temp(*this); 
+	   ++(*this);
+      return temp;
    }
 
    // prefix decrement
    iterator& operator -- ()
    {
+	   --p;
       return *this;
    }
 
    // postfix decrement
-   iterator operator -- (int postfix)
+   iterator operator -- (int)
    {
-      return *this;
+	  iterator temp = *this;
+	  --(*this); 
+	  return temp; // return the unincremented version
    }
 
 private:
-   T* p;
+	T* p; // pointer being encapsulated
 };
 
 /*****************************************

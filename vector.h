@@ -107,9 +107,12 @@ public:
 
    void clear()
    {
+	   numElements = 0;
    }
    void pop_back()
    {
+       if (numElements > 0)
+		   --numElements;
    }
    void shrink_to_fit();
 
@@ -117,9 +120,9 @@ public:
    // Status
    //
 
-   size_t  size()          const { return 999;}
-   size_t  capacity()      const { return 999;}
-   bool empty()            const { return true;}
+   size_t  size()          const {return numElements;}
+   size_t  capacity()      const {return numCapacity;}
+   bool empty()            const {return numElements == 0;}
    
    // adjust the size of the buffer
    
@@ -327,7 +330,7 @@ vector <T> :: vector (vector && rhs)
 template <typename T>
 vector <T> :: ~vector()
 {
-
+	delete[] data;
 }
 
 /***************************************
@@ -340,12 +343,32 @@ vector <T> :: ~vector()
 template <typename T>
 void vector <T> :: resize(size_t newElements)
 {
+    if (newElements < numElements)
+      numElements = newElements;
+   else if (newElements > numElements)
+   {
+      if (newElements > numCapacity)
+         reserve(newElements);
+      for (size_t i = numElements; i < newElements; ++i)
+         data[i] = T();
+      numElements = newElements;
+   }
    
 }
 
 template <typename T>
 void vector <T> :: resize(size_t newElements, const T & t)
 {
+    if (newElements < numElements)
+      numElements = newElements;
+   else if (newElements > numElements)
+   {
+      if (newElements > numCapacity)
+         reserve(newElements);
+      for (size_t i = numElements; i < newElements; ++i)
+         data[i] = t;
+      numElements = newElements;
+	}
    
 }
 
@@ -388,6 +411,25 @@ void vector <T> :: reserve(size_t newCapacity)
 template <typename T>
 void vector <T> :: shrink_to_fit()
 {
+    if (numElements == numCapacity)
+      return;
+   if (numElements == 0)
+   {
+      delete[] data;
+      data = nullptr;
+      numCapacity = 0;
+      return;
+   }
+   // allocate new buffer
+   T* newData = new T[numElements];
+   // copy existing elements
+   for (size_t i = 0; i < numElements; ++i)
+      newData[i] = data[i];
+   // clean up old buffer
+   delete[] data;
+   // update pointers and capacity
+   data = newData;
+   numCapacity = numElements;
    
 }
 
